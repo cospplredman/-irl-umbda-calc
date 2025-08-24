@@ -1,5 +1,5 @@
 
-.PHONY: clean all
+.PHONY: clean all format
 
 SRC=src_c/main.c
 OUT=out
@@ -13,6 +13,9 @@ all: $(OUT)/lc
 
 clean:
 	rm -f $(OUT)/lc $(OUT)/lc.a $(OBJ)
+
+format:
+	clang-format -i $(SRC)
 
 $(OUT)/%.o: src_c/%.c
 	mkdir -p $(OUT)
