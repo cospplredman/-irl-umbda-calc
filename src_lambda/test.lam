@@ -1,0 +1,112 @@
+(\x.x x)(\x.\f.f x)\let.
+let (\x.x x) \U.
+let (\x.\y.\z.x z(y z)) \S.
+let (\a.\b.a) \K.
+let (\x.x) \I.
+let (\x.\y.\z.x z y) \C.
+let (\f.\g.\x.f(g x)) \B.
+let (B U(C B U)) \Y.
+
+
+let (\a.\b.\P. P a b) \Pair.
+
+let K \true.
+let (C K) \false.
+
+
+let (\N.\Z.\2n.\2n+1.N) \Neg.
+let (\N.\Z.\2n.\2n+1.Z) \Zero.
+
+let (\n. 
+	let (K \N.\Z.\2n.\2n+1.2n n) \_2n.
+	n (_2n Zero) Zero _2n _2n
+) \2n.
+
+let (\n.
+	let (K \N.\Z.\2n.\2n+1.2n+1 n) \_2n+1.
+	n Neg (_2n+1 Neg) _2n+1 _2n+1
+) \2n+1.
+
+
+
+
+let (Y \self.\a. a Zero (2n+1 Zero) 2n+1 (B 2n self)) \Succ.
+let (Y \self.\a. a (2n Neg) Neg (B 2n+1 self) 2n) \Pred.
+let (Y \self.\a. a Zero Neg (B 2n+1 self) (B 2n self)) \bnot.
+let (B Succ bnot) \negate.
+let (Y \self.\a. a Neg Zero self 
+	(\na. (self na) Neg (Succ Zero) (K _|_) (K (Succ Zero)))) \Sign.
+
+
+
+let (Y \Add.\a.\b. 
+    let (Y \Add+1.\a.\b. a b (Succ b)
+        (\na. b a (Succ a)
+            (B 2n+1 (Add na))
+            (B 2n (Add+1 na)))
+        (\na. b a (Succ a)
+            (B 2n (Add+1 na))
+            (B 2n+1 (Add+1 na)))
+    ) \Add+1.
+    a (Pred b) b
+        (\na. b (Pred a) a
+            (B 2n (Add na))
+            (B 2n+1 (Add na)))
+        (\na. b (Pred a) a
+            (B 2n+1 (Add na))
+            (B 2n (Add+1 na)))
+) \Add.
+
+let (\a.\b. Add a (negate b)) \Sub.
+let (\a.\b. Sign (Sub a b) true false (K _|_) (K false)) \lt.
+let (\a.\b. Sign (Sub a b) false false (K _|_) (K true)) \gt.
+let (\a.\b. Sign (Sub a b) true true (K _|_) (K false)) \lte.
+let (\a.\b. Sign (Sub a b) false true (K _|_) (K true)) \gte.
+let (\a.\b. Sign (Sub a b) false true (K _|_) (K false)) \eq.
+let (\a.\b. Sign (Sub a b) true false (K _|_) (K true)) \neq.
+
+let (Y \Mul.\a.\b. b (negate a) Zero
+	(Mul (2n a))
+	(B (Add a) (Mul (2n a)))) \Mul.
+
+let (\a. Mul (Sign a) a) \Abs.
+
+let (\a.\b.
+	Pair (Sign a) (Sign b) \sa.\sb.
+	Pair (Mul sa a) (Mul sb b) \A.\B.
+	
+	let (Y \EucDiv.\a.\b. (lt a b)
+		(Pair Zero a)
+		(EucDiv a (2n b)
+			\Q.\R. (lt R b)
+				(Pair (2n Q) R)
+				(Pair (2n+1 Q) (Sub R b))))
+	\EucDiv. EucDiv A B
+		\Q.\R. (lt sa Zero)
+			((eq Zero R)
+				(Pair (Mul (Mul sb sa) Q) Zero)
+				(Pair (Mul (Mul sb sa) (Succ Q)) (Sub B R)))
+			(Pair (Mul sb Q) R)
+) \EucDiv.
+
+let (\a.\b. EucDiv a b K) \Div.
+let (\a.\b. EucDiv a b (C K)) \Mod.
+let (Y \gcd.\a.\b. (eq a Zero) b ((eq b Zero) a (gcd b (Mod a b)))) \gcd.
+
+let (2n+1 Zero) \1.
+let (2n 1) \2.
+let (2n 2) \4.
+let (2n 4) \8.
+
+let (Sub 8 1) \7.
+let (negate 7) \-7.
+let (Add 2 1) \3.
+let (negate 3) \-3.
+let (EucDiv -7 -3) \div.
+
+let (Y \rec.\n. n (atoi "-1") (atoi "0") (\n. c_2n (rec n)) (\x. c_inc (c_2n (rec x)))) \bin_scott_to_i.
+
+let (Y \rec.\n. eq n Zero 1 (eq n 1 1 (Add (rec (Sub n 1)) (rec (Sub n 2))))) \fib.
+
+print_i (bin_scott_to_i (fib (Mul 8 3)))
+
