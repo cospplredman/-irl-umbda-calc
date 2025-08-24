@@ -1,13 +1,14 @@
 
 .PHONY: clean all format
 
-SRC=src_c/main.c
+SRC=$(wildcard src_c/*.c)
+HEADER=$(wildcard src_c/*.h)
 OUT=out
-OBJ=$(OUT)/main.o
+OBJ=$(addprefix $(OUT)/, $(notdir $(SRC:.c=.o)))
 
 CC=gcc
 O4_FLAGS='-march=native' '-mtune=native' '-O3' '-fsched-pressure' '-fmodulo-sched' '-fmodulo-sched-allow-regmoves' '-fgcse-sm' '-fgcse-las' '-fivopts' '-fgraphite-identity' '-ftree-vectorize' '-floop-nest-optimize' '-ftree-loop-im' '-ftree-loop-ivcanon' '-funroll-loops' '-fdevirtualize-speculatively'
-CFLAGS=-std=c99 -O3 -Wall -Werror ${O4_FLAGS}
+CFLAGS=-std=c99 -O3 -Wall -Werror $(O4_FLAGS)
 
 all: $(OUT)/lc
 
@@ -15,7 +16,7 @@ clean:
 	rm -f $(OUT)/lc $(OUT)/lc.a $(OBJ)
 
 format:
-	clang-format -i $(SRC)
+	clang-format -i $(SRC) $(HEADER)
 
 $(OUT)/%.o: src_c/%.c
 	mkdir -p $(OUT)

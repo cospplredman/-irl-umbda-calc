@@ -1,4 +1,8 @@
-#include "lib.c"
+#include "lc_builtins.h"
+#include "lc_env.h"
+#include "lc_eval.h"
+#include "lc_parse.h"
+#include "lc_tr.h"
 
 int main(int argc, char **argv) {
   char *str = "";
@@ -44,6 +48,5 @@ int main(int argc, char **argv) {
   lc_env_free(env);
   free(str);
 
-  printf("function applications: %zu\n", function_applications);
   return 0;
 }
