@@ -1,5 +1,7 @@
 #ifndef GC_LC_LC_TR_H
 #define GC_LC_LC_TR_H
+#include "lc_memory_pool.h"
+#include "stdint.h"
 #include "stdio.h"
 #include "stdlib.h"
 
@@ -7,7 +9,7 @@ enum lc_tr_type { LC_REF, LC_APP, LC_ABS, LC_THUNK, LC_C_VALUE, LC_C_FUNC };
 
 struct lc_tr {
   enum lc_tr_type type;
-  size_t ref_count;
+  int64_t ref_count;
 
   union {
     struct lc_ref {

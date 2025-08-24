@@ -1,11 +1,16 @@
 #include "lc_builtins.h"
 #include "lc_env.h"
 #include "lc_eval.h"
+#include "lc_memory_pool.h"
 #include "lc_parse.h"
 #include "lc_tr.h"
 
+struct lc_memory_pool *memory_pool;
+
 int main(int argc, char **argv) {
   char *str = "";
+
+  memory_pool = lc_memory_pool(1u << 24u);
 
   struct lc_env *env =
       // TODO: Replace this with a static lookup table. possible with a linked
@@ -46,6 +51,7 @@ int main(int argc, char **argv) {
   lc_tr_free(ret);
   lc_tr_free(tr);
   lc_env_free(env);
+  lc_memory_pool_free_pool(memory_pool);
   free(str);
 
   return 0;

@@ -1,6 +1,7 @@
 #ifndef GC_LC_LC_PARSE_H
 #define GC_LC_LC_PARSE_H
 
+#include "lc_memory_pool.h"
 #include "lc_tr.h"
 
 char *read_file(char *path);

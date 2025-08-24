@@ -2,7 +2,7 @@
 #include "string.h"
 
 struct lc_tr *lc_tr_ref(char *start, size_t length) {
-  struct lc_tr *ret = malloc(sizeof(struct lc_tr));
+  struct lc_tr *ret = lc_memory_pool_alloc(memory_pool);
   *ret = (struct lc_tr){.type = LC_REF,
                         .cell.ref.start = start,
                         .cell.ref.length = length,
@@ -11,14 +11,14 @@ struct lc_tr *lc_tr_ref(char *start, size_t length) {
 }
 
 struct lc_tr *lc_tr_app(struct lc_tr *fn, struct lc_tr *arg) {
-  struct lc_tr *ret = malloc(sizeof(struct lc_tr));
+  struct lc_tr *ret = lc_memory_pool_alloc(memory_pool);
   *ret = (struct lc_tr){
       .type = LC_APP, .cell.app.fn = fn, .cell.app.arg = arg, .ref_count = 0};
   return ret;
 }
 
 struct lc_tr *lc_tr_abs(struct lc_tr *arg, struct lc_tr *body) {
-  struct lc_tr *ret = malloc(sizeof(struct lc_tr));
+  struct lc_tr *ret = lc_memory_pool_alloc(memory_pool);
   *ret = (struct lc_tr){.type = LC_ABS,
                         .cell.abs.arg = arg,
                         .cell.abs.body = body,
@@ -27,7 +27,7 @@ struct lc_tr *lc_tr_abs(struct lc_tr *arg, struct lc_tr *body) {
 }
 
 struct lc_tr *lc_tr_thunk(struct lc_tr *val, struct lc_tr *eval) {
-  struct lc_tr *ret = malloc(sizeof(struct lc_tr));
+  struct lc_tr *ret = lc_memory_pool_alloc(memory_pool);
   *ret = (struct lc_tr){.type = LC_THUNK,
                         .cell.thunk.val = val,
                         .cell.thunk.eval = eval,
@@ -36,14 +36,14 @@ struct lc_tr *lc_tr_thunk(struct lc_tr *val, struct lc_tr *eval) {
 }
 
 struct lc_tr *lc_tr_c_value(void *val) {
-  struct lc_tr *ret = malloc(sizeof(struct lc_tr));
+  struct lc_tr *ret = lc_memory_pool_alloc(memory_pool);
   *ret = (struct lc_tr){
       .type = LC_C_VALUE, .cell.c_value.value = val, .ref_count = 0};
   return ret;
 }
 
 struct lc_tr *lc_tr_c_func(struct lc_tr *(*func)(struct lc_tr *)) {
-  struct lc_tr *ret = malloc(sizeof(struct lc_tr));
+  struct lc_tr *ret = lc_memory_pool_alloc(memory_pool);
   *ret = (struct lc_tr){
       .type = LC_C_FUNC, .cell.c_func.func = func, .ref_count = 0};
   return ret;
@@ -60,29 +60,29 @@ void lc_tr_free(struct lc_tr *tr) {
 
   switch (tr->type) {
   case LC_REF:
-    free(tr);
+    lc_memory_pool_free(memory_pool, tr);
     break;
   case LC_APP:
     lc_tr_free(tr->cell.app.fn);
     lc_tr_free(tr->cell.app.arg);
-    free(tr);
+    lc_memory_pool_free(memory_pool, tr);
     break;
   case LC_ABS:
     lc_tr_free(tr->cell.abs.arg);
     lc_tr_free(tr->cell.abs.body);
-    free(tr);
+    lc_memory_pool_free(memory_pool, tr);
     break;
   case LC_THUNK:
     lc_tr_free(tr->cell.thunk.val);
     lc_tr_free(tr->cell.thunk.eval);
-    free(tr);
+    lc_memory_pool_free(memory_pool, tr);
     break;
   case LC_C_VALUE:
     free(tr->cell.c_value.value);
-    free(tr);
+    lc_memory_pool_free(memory_pool, tr);
     break;
   case LC_C_FUNC:
-    free(tr);
+    lc_memory_pool_free(memory_pool, tr);
     break;
   }
 }
@@ -143,8 +143,8 @@ void lc_tr_print(FILE *out, struct lc_tr *tr, size_t indent) {
 int lc_tr_ref_eq(struct lc_tr *a, struct lc_tr *b) {
   if (a->type == LC_REF && b->type == LC_REF) {
     if (a->cell.ref.length == b->cell.ref.length) {
-      return strncmp(a->cell.ref.start, b->cell.ref.start,
-                     a->cell.ref.length) == 0;
+      return a == b || strncmp(a->cell.ref.start, b->cell.ref.start,
+                               a->cell.ref.length) == 0;
     }
   }
   return 0;
