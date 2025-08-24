@@ -1,5 +1,4 @@
 #include "lc_builtins.h"
-#include "lc_tr.h"
 
 struct lc_tr *lc_c_print_tr(struct lc_tr *arg) {
   lc_tr_print(stdout, arg, 0);

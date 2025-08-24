@@ -24,7 +24,8 @@ static struct lc_tr *lc_tr_beta(struct lc_tr *body, struct lc_tr *ref,
     }
 
     body->cell.abs.arg->ref_count++;
-    return lc_tr_abs(body->cell.abs.arg, lc_tr_beta(body->cell.abs.body, ref, val));
+    return lc_tr_abs(body->cell.abs.arg,
+                     lc_tr_beta(body->cell.abs.body, ref, val));
   }
   case LC_THUNK: {
     body->ref_count++;
@@ -50,8 +51,9 @@ static struct lc_tr *lc_tr_call(struct lc_tr *fn, struct lc_tr *arg,
   switch (fn->type) {
   case LC_ABS: {
     arg->ref_count++;
-    struct lc_tr *ret, *thunk = lc_tr_thunk(arg, NULL),
-                       *beta = lc_tr_beta(fn->cell.abs.body, fn->cell.abs.arg, thunk);
+    struct lc_tr *ret,
+        *thunk = lc_tr_thunk(arg, NULL),
+        *beta = lc_tr_beta(fn->cell.abs.body, fn->cell.abs.arg, thunk);
 
     ret = eval_lc(beta, env);
 
@@ -105,6 +107,7 @@ struct lc_tr *eval_lc(struct lc_tr *tr, struct lc_env *env) {
   }
   }
 
-  fprintf(stderr, "\r\nreached end of eval_lc %p %p\r\n", (void*)tr, (void*)env);
+  fprintf(stderr, "\r\nreached end of eval_lc %p %p\r\n", (void *)tr,
+          (void *)env);
   return NULL;
 }
