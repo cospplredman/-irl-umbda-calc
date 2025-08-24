@@ -4,41 +4,41 @@
 struct lc_tr *lc_tr_ref(char *start, size_t length) {
   struct lc_tr *ret = malloc(sizeof(struct lc_tr));
   *ret = (struct lc_tr){
-      .type = LC_REF, .ref.start = start, .ref.length = length, .ref_count = 0};
+      .type = LC_REF, .cell.ref.start = start, .cell.ref.length = length, .ref_count = 0};
   return ret;
 }
 
 struct lc_tr *lc_tr_app(struct lc_tr *fn, struct lc_tr *arg) {
   struct lc_tr *ret = malloc(sizeof(struct lc_tr));
   *ret = (struct lc_tr){
-      .type = LC_APP, .app.fn = fn, .app.arg = arg, .ref_count = 0};
+      .type = LC_APP, .cell.app.fn = fn, .cell.app.arg = arg, .ref_count = 0};
   return ret;
 }
 
 struct lc_tr *lc_tr_abs(struct lc_tr *arg, struct lc_tr *body) {
   struct lc_tr *ret = malloc(sizeof(struct lc_tr));
   *ret = (struct lc_tr){
-      .type = LC_ABS, .abs.arg = arg, .abs.body = body, .ref_count = 0};
+      .type = LC_ABS, .cell.abs.arg = arg, .cell.abs.body = body, .ref_count = 0};
   return ret;
 }
 
 struct lc_tr *lc_tr_thunk(struct lc_tr *val, struct lc_tr *eval) {
   struct lc_tr *ret = malloc(sizeof(struct lc_tr));
   *ret = (struct lc_tr){
-      .type = LC_THUNK, .thunk.val = val, .thunk.eval = eval, .ref_count = 0};
+      .type = LC_THUNK, .cell.thunk.val = val, .cell.thunk.eval = eval, .ref_count = 0};
   return ret;
 }
 
 struct lc_tr *lc_tr_c_value(void *val) {
   struct lc_tr *ret = malloc(sizeof(struct lc_tr));
   *ret =
-      (struct lc_tr){.type = LC_C_VALUE, .c_value.value = val, .ref_count = 0};
+      (struct lc_tr){.type = LC_C_VALUE, .cell.c_value.value = val, .ref_count = 0};
   return ret;
 }
 
 struct lc_tr *lc_tr_c_func(struct lc_tr *(*func)(struct lc_tr *)) {
   struct lc_tr *ret = malloc(sizeof(struct lc_tr));
-  *ret = (struct lc_tr){.type = LC_C_FUNC, .c_func.func = func, .ref_count = 0};
+  *ret = (struct lc_tr){.type = LC_C_FUNC, .cell.c_func.func = func, .ref_count = 0};
   return ret;
 }
 
@@ -56,22 +56,22 @@ void lc_tr_free(struct lc_tr *tr) {
     free(tr);
     break;
   case LC_APP:
-    lc_tr_free(tr->app.fn);
-    lc_tr_free(tr->app.arg);
+    lc_tr_free(tr->cell.app.fn);
+    lc_tr_free(tr->cell.app.arg);
     free(tr);
     break;
   case LC_ABS:
-    lc_tr_free(tr->abs.arg);
-    lc_tr_free(tr->abs.body);
+    lc_tr_free(tr->cell.abs.arg);
+    lc_tr_free(tr->cell.abs.body);
     free(tr);
     break;
   case LC_THUNK:
-    lc_tr_free(tr->thunk.val);
-    lc_tr_free(tr->thunk.eval);
+    lc_tr_free(tr->cell.thunk.val);
+    lc_tr_free(tr->cell.thunk.eval);
     free(tr);
     break;
   case LC_C_VALUE:
-    free(tr->c_value.value);
+    free(tr->cell.c_value.value);
     free(tr);
     break;
   case LC_C_FUNC:
@@ -95,37 +95,37 @@ void lc_tr_print(FILE *out, struct lc_tr *tr, size_t indent) {
   switch (tr->type) {
   case LC_REF:
     print_indent(out, indent);
-    fprintf(out, "| REF: %.*s %p %zu\n", (int)tr->ref.length, tr->ref.start, tr,
+    fprintf(out, "| REF: %.*s %p %zu\n", (int)tr->cell.ref.length, tr->cell.ref.start, (void*)tr,
             tr->ref_count);
     break;
   case LC_APP:
     print_indent(out, indent);
-    fprintf(out, "| APP: %p %zu\n", tr, tr->ref_count);
-    lc_tr_print(out, tr->app.fn, indent + 1);
-    lc_tr_print(out, tr->app.arg, indent + 1);
+    fprintf(out, "| APP: %p %zu\n", (void*)tr, tr->ref_count);
+    lc_tr_print(out, tr->cell.app.fn, indent + 1);
+    lc_tr_print(out, tr->cell.app.arg, indent + 1);
     break;
   case LC_ABS:
     print_indent(out, indent);
-    fprintf(out, "| ABS: %p %zu\n", tr, tr->ref_count);
-    lc_tr_print(out, tr->abs.arg, indent + 1);
-    lc_tr_print(out, tr->abs.body, indent + 1);
+    fprintf(out, "| ABS: %p %zu\n", (void*)tr, tr->ref_count);
+    lc_tr_print(out, tr->cell.abs.arg, indent + 1);
+    lc_tr_print(out, tr->cell.abs.body, indent + 1);
     break;
   case LC_THUNK:
     print_indent(out, indent);
-    fprintf(out, "| THUNK: %p %zu\n", tr, tr->ref_count);
-    if (tr->thunk.eval != NULL) {
-      lc_tr_print(out, tr->thunk.eval, indent + 1);
+    fprintf(out, "| THUNK: %p %zu\n", (void*)tr, tr->ref_count);
+    if (tr->cell.thunk.eval != NULL) {
+      lc_tr_print(out, tr->cell.thunk.eval, indent + 1);
     } else {
-      lc_tr_print(out, tr->thunk.val, indent + 1);
+      lc_tr_print(out, tr->cell.thunk.val, indent + 1);
     }
     break;
   case LC_C_VALUE:
     print_indent(out, indent);
-    fprintf(out, "| C_VALUE: %p %zu\n", tr, tr->ref_count);
+    fprintf(out, "| C_VALUE: %p %zu\n", (void*)tr, tr->ref_count);
     break;
   case LC_C_FUNC:
     print_indent(out, indent);
-    fprintf(out, "| C_FUNC: %p %zu\n", tr, tr->ref_count);
+    fprintf(out, "| C_FUNC: %p %zu\n", (void*)tr, tr->ref_count);
     break;
   default:
     print_indent(out, indent);
@@ -135,8 +135,8 @@ void lc_tr_print(FILE *out, struct lc_tr *tr, size_t indent) {
 
 int lc_tr_ref_eq(struct lc_tr *a, struct lc_tr *b) {
   if (a->type == LC_REF && b->type == LC_REF) {
-    if (a->ref.length == b->ref.length) {
-      return strncmp(a->ref.start, b->ref.start, a->ref.length) == 0;
+    if (a->cell.ref.length == b->cell.ref.length) {
+      return strncmp(a->cell.ref.start, b->cell.ref.start, a->cell.ref.length) == 0;
     }
   }
   return 0;

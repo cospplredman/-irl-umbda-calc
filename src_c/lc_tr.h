@@ -30,7 +30,7 @@ struct lc_tr {
     struct lc_c_func {
       struct lc_tr *(*func)(struct lc_tr *arg);
     } c_func; // TODO maybe add an arity tag?
-  };
+  } cell;
 };
 
 struct lc_tr *lc_tr_ref(char *start, size_t length);

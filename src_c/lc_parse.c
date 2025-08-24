@@ -137,7 +137,7 @@ static struct lc_tr *parse_lc_app(char **str) {
   *str = start;
 
   return NULL;
-};
+}
 
 static struct lc_tr *parse_lc_abs(char **str) {
   char *start = *str;

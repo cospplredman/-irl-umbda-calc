@@ -14,17 +14,17 @@ static struct lc_tr *lc_tr_beta(struct lc_tr *body, struct lc_tr *ref,
     return body;
   }
   case LC_APP: {
-    return lc_tr_app(lc_tr_beta(body->app.fn, ref, val),
-                     lc_tr_beta(body->app.arg, ref, val));
+    return lc_tr_app(lc_tr_beta(body->cell.app.fn, ref, val),
+                     lc_tr_beta(body->cell.app.arg, ref, val));
   }
   case LC_ABS: {
-    if (lc_tr_ref_eq(ref, body->abs.arg)) {
+    if (lc_tr_ref_eq(ref, body->cell.abs.arg)) {
       body->ref_count++;
       return body;
     }
 
-    body->abs.arg->ref_count++;
-    return lc_tr_abs(body->abs.arg, lc_tr_beta(body->abs.body, ref, val));
+    body->cell.abs.arg->ref_count++;
+    return lc_tr_abs(body->cell.abs.arg, lc_tr_beta(body->cell.abs.body, ref, val));
   }
   case LC_THUNK: {
     body->ref_count++;
@@ -51,7 +51,7 @@ static struct lc_tr *lc_tr_call(struct lc_tr *fn, struct lc_tr *arg,
   case LC_ABS: {
     arg->ref_count++;
     struct lc_tr *ret, *thunk = lc_tr_thunk(arg, NULL),
-                       *beta = lc_tr_beta(fn->abs.body, fn->abs.arg, thunk);
+                       *beta = lc_tr_beta(fn->cell.abs.body, fn->cell.abs.arg, thunk);
 
     ret = eval_lc(beta, env);
 
@@ -62,7 +62,7 @@ static struct lc_tr *lc_tr_call(struct lc_tr *fn, struct lc_tr *arg,
     return ret;
   }
   case LC_C_FUNC: {
-    struct lc_tr *val = eval_lc(arg, env), *ret = fn->c_func.func(val);
+    struct lc_tr *val = eval_lc(arg, env), *ret = fn->cell.c_func.func(val);
 
     lc_tr_free(fn);
     lc_tr_free(val);
@@ -83,17 +83,17 @@ struct lc_tr *eval_lc(struct lc_tr *tr, struct lc_env *env) {
   case LC_REF:
     return lc_env_lookup(env, tr);
   case LC_APP:
-    return lc_tr_call(eval_lc(tr->app.fn, env), tr->app.arg, env);
+    return lc_tr_call(eval_lc(tr->cell.app.fn, env), tr->cell.app.arg, env);
   case LC_ABS:
     tr->ref_count++;
     return tr;
   case LC_THUNK: {
-    if (tr->thunk.eval == NULL) {
-      tr->thunk.eval = eval_lc(tr->thunk.val, env);
+    if (tr->cell.thunk.eval == NULL) {
+      tr->cell.thunk.eval = eval_lc(tr->cell.thunk.val, env);
     }
 
-    tr->thunk.eval->ref_count++;
-    return tr->thunk.eval;
+    tr->cell.thunk.eval->ref_count++;
+    return tr->cell.thunk.eval;
   }
   case LC_C_VALUE: {
     tr->ref_count++;
@@ -105,6 +105,6 @@ struct lc_tr *eval_lc(struct lc_tr *tr, struct lc_env *env) {
   }
   }
 
-  fprintf(stderr, "\r\nreached end of eval_lc %p %p\r\n", tr, env);
+  fprintf(stderr, "\r\nreached end of eval_lc %p %p\r\n", (void*)tr, (void*)env);
   return NULL;
 }
