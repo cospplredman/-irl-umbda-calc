@@ -108,5 +108,5 @@ let (Y \rec.\n. n (atoi "-1") (atoi "0") (\n. c_2n (rec n)) (\x. c_inc (c_2n (re
 
 let (Y \rec.\n. eq n Zero 1 (eq n 1 1 (Add (rec (Sub n 1)) (rec (Sub n 2))))) \fib.
 
-print_i (bin_scott_to_i (fib (Mul 8 2)))
+print_i (bin_scott_to_i (fib (Mul 8 3)))
 

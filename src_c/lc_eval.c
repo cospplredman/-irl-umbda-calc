@@ -92,6 +92,8 @@ struct lc_tr *eval_lc(struct lc_tr *tr, struct lc_env *env) {
   case LC_THUNK: {
     if (tr->cell.thunk.eval == NULL) {
       tr->cell.thunk.eval = eval_lc(tr->cell.thunk.val, env);
+      lc_tr_free(tr->cell.thunk.val);
+      tr->cell.thunk.val = NULL;
     }
 
     tr->cell.thunk.eval->ref_count++;

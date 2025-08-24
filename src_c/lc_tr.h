@@ -8,8 +8,8 @@
 enum lc_tr_type { LC_REF, LC_APP, LC_ABS, LC_THUNK, LC_C_VALUE, LC_C_FUNC };
 
 struct lc_tr {
-  enum lc_tr_type type;
-  int64_t ref_count;
+  enum lc_tr_type type : 3;
+  size_t ref_count : 61;
 
   union {
     struct lc_ref {

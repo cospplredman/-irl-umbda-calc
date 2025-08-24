@@ -103,23 +103,23 @@ void lc_tr_print(FILE *out, struct lc_tr *tr, size_t indent) {
   case LC_REF:
     print_indent(out, indent);
     fprintf(out, "| REF: %.*s %p %zu\n", (int)tr->cell.ref.length,
-            tr->cell.ref.start, (void *)tr, tr->ref_count);
+            tr->cell.ref.start, (void *)tr, (size_t)tr->ref_count);
     break;
   case LC_APP:
     print_indent(out, indent);
-    fprintf(out, "| APP: %p %zu\n", (void *)tr, tr->ref_count);
+    fprintf(out, "| APP: %p %zu\n", (void *)tr, (size_t)tr->ref_count);
     lc_tr_print(out, tr->cell.app.fn, indent + 1);
     lc_tr_print(out, tr->cell.app.arg, indent + 1);
     break;
   case LC_ABS:
     print_indent(out, indent);
-    fprintf(out, "| ABS: %p %zu\n", (void *)tr, tr->ref_count);
+    fprintf(out, "| ABS: %p %zu\n", (void *)tr, (size_t)tr->ref_count);
     lc_tr_print(out, tr->cell.abs.arg, indent + 1);
     lc_tr_print(out, tr->cell.abs.body, indent + 1);
     break;
   case LC_THUNK:
     print_indent(out, indent);
-    fprintf(out, "| THUNK: %p %zu\n", (void *)tr, tr->ref_count);
+    fprintf(out, "| THUNK: %p %zu\n", (void *)tr, (size_t)tr->ref_count);
     if (tr->cell.thunk.eval != NULL) {
       lc_tr_print(out, tr->cell.thunk.eval, indent + 1);
     } else {
@@ -128,11 +128,11 @@ void lc_tr_print(FILE *out, struct lc_tr *tr, size_t indent) {
     break;
   case LC_C_VALUE:
     print_indent(out, indent);
-    fprintf(out, "| C_VALUE: %p %zu\n", (void *)tr, tr->ref_count);
+    fprintf(out, "| C_VALUE: %p %zu\n", (void *)tr, (size_t)tr->ref_count);
     break;
   case LC_C_FUNC:
     print_indent(out, indent);
-    fprintf(out, "| C_FUNC: %p %zu\n", (void *)tr, tr->ref_count);
+    fprintf(out, "| C_FUNC: %p %zu\n", (void *)tr, (size_t)tr->ref_count);
     break;
   default:
     print_indent(out, indent);
