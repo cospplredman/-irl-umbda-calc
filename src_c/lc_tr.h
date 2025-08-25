@@ -1,5 +1,6 @@
 #ifndef GC_LC_LC_TR_H
 #define GC_LC_LC_TR_H
+#include "lc_env.h"
 #include "lc_memory_pool.h"
 #include "stdint.h"
 #include "stdio.h"
@@ -34,6 +35,8 @@ struct lc_tr {
 		} c_func; // TODO maybe add an arity tag?
 	} cell;
 };
+
+extern struct lc_trie_env *sym_table;
 
 struct lc_tr *lc_tr_ref(char *start, size_t length);
 struct lc_tr *lc_tr_app(struct lc_tr *fn, struct lc_tr *arg);

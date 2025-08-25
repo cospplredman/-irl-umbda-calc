@@ -4,6 +4,7 @@
 #include "lc_env.h"
 #include "lc_tr.h"
 
-struct lc_tr *eval_lc(struct lc_tr *tr, struct lc_env *env);
+struct lc_tr *eval_lc(struct lc_tr *tr);
+struct lc_tr *lc_tr_beta_env(struct lc_tr *body, struct lc_trie_env *env);
 
 #endif

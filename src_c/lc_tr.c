@@ -2,12 +2,23 @@
 #include "string.h"
 
 struct lc_tr *lc_tr_ref(char *start, size_t length) {
-	struct lc_tr *ret = lc_memory_pool_alloc(memory_pool);
-	*ret = (struct lc_tr){.type = LC_REF,
-			      .cell.ref.start = start,
-			      .cell.ref.length = length,
-			      .ref_count = 0};
-	return ret;
+	struct lc_tr tr = (struct lc_tr){.type = LC_REF,
+					 .cell.ref.start = start,
+					 .cell.ref.length = length,
+					 .ref_count = 0};
+
+	struct lc_tr **sym = lc_trie_env_get_ref(sym_table, &tr);
+	if (*sym == NULL) {
+		struct lc_tr *ret = lc_memory_pool_alloc(memory_pool);
+		*ret = tr;
+		*sym = ret;
+		(*sym)->ref_count++;
+
+		return *sym;
+	}
+
+	(*sym)->ref_count++;
+	return *sym;
 }
 
 struct lc_tr *lc_tr_app(struct lc_tr *fn, struct lc_tr *arg) {
@@ -148,12 +159,7 @@ void lc_tr_print(FILE *out, struct lc_tr *tr, size_t indent) {
 }
 
 int lc_tr_ref_eq(struct lc_tr *a, struct lc_tr *b) {
-	if (a->type == LC_REF && b->type == LC_REF) {
-		if (a->cell.ref.length == b->cell.ref.length) {
-			return a == b ||
-			       strncmp(a->cell.ref.start, b->cell.ref.start,
-				       a->cell.ref.length) == 0;
-		}
-	}
-	return 0;
+	// references are unique now
+	// reduces cache misses
+	return a == b;
 }
