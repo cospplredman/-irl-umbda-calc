@@ -5,11 +5,11 @@
 #include "stddef.h"
 
 struct lc_memory_pool {
-  size_t size;
-  struct lc_tr *buffer;
+	size_t size;
+	struct lc_tr *buffer;
 
-  size_t free_list_end;
-  size_t *free_list;
+	size_t free_list_end;
+	size_t *free_list;
 };
 
 extern struct lc_memory_pool *memory_pool;

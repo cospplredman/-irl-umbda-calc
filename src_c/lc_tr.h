@@ -8,31 +8,31 @@
 enum lc_tr_type { LC_REF, LC_APP, LC_ABS, LC_THUNK, LC_C_VALUE, LC_C_FUNC };
 
 struct lc_tr {
-  enum lc_tr_type type : 3;
-  size_t ref_count : 61;
+	enum lc_tr_type type : 3;
+	size_t ref_count : 61;
 
-  union {
-    struct lc_ref {
-      char *start;
-      size_t length;
-    } ref;
-    struct lc_app {
-      struct lc_tr *fn, *arg;
-    } app;
-    struct lc_abs {
-      struct lc_tr *arg, *body;
-    } abs;
-    struct lc_thunk {
-      struct lc_tr *val, *eval;
-    } thunk;
+	union {
+		struct lc_ref {
+			char *start;
+			size_t length;
+		} ref;
+		struct lc_app {
+			struct lc_tr *fn, *arg;
+		} app;
+		struct lc_abs {
+			struct lc_tr *arg, *body;
+		} abs;
+		struct lc_thunk {
+			struct lc_tr *val, *eval;
+		} thunk;
 
-    struct lc_c_value {
-      void *value;
-    } c_value;
-    struct lc_c_func {
-      struct lc_tr *(*func)(struct lc_tr *arg);
-    } c_func; // TODO maybe add an arity tag?
-  } cell;
+		struct lc_c_value {
+			void *value;
+		} c_value;
+		struct lc_c_func {
+			struct lc_tr *(*func)(struct lc_tr *arg);
+		} c_func; // TODO maybe add an arity tag?
+	} cell;
 };
 
 struct lc_tr *lc_tr_ref(char *start, size_t length);
